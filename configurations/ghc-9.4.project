@@ -1,0 +1,5 @@
+packages: ./integer-types.cabal
+
+constraints:
+    base == 4.17.*
+  , hedgehog == 1.2
