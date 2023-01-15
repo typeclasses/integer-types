@@ -1,0 +1,6 @@
+dist
+dist-*
+result
+result-*
+*.yaml
+*.local
