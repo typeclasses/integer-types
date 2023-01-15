@@ -32,7 +32,7 @@ common base
         PatternSynonyms
         ViewPatterns
     build-depends:
-        base ^>= 4.16 || ^>= 4.17
+      , base ^>= 4.16 || ^>= 4.17
       , deepseq ^>= 1.4.6
 
 common test
@@ -40,18 +40,18 @@ common test
     default-extensions:
         AllowAmbiguousTypes
     build-depends:
-        exceptions ^>= 0.10.4
+      , exceptions ^>= 0.10.4
       , integer-types
 
 common test-with-hedgehog
     import: test
     build-depends:
-        hedgehog ^>= 1.1 || ^>= 1.2
+      , hedgehog ^>= 1.1 || ^>= 1.2
 
 common test-with-hspec
     import: test
     build-depends:
-        hspec ^>= 2.9 || ^>= 2.10
+      , hspec ^>= 2.9 || ^>= 2.10
 
 library
     import: base
