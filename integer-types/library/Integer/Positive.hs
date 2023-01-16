@@ -1,5 +1,3 @@
-{-# language Trustworthy #-}
-
 module Integer.Positive
   (
     {- * Type -} Positive,
@@ -14,9 +12,9 @@ module Integer.Positive
   )
   where
 
-import Data.Function (($))
+import Essentials
+
 import Data.Int (Int)
-import Data.Maybe (Maybe (..))
 import Data.Word (Word)
 import Integer.Positive.Unsafe (Positive, addOne, one, toInteger, toNatural)
 import Integer.Signed (Signed (..))

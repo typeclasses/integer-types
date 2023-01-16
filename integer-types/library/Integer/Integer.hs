@@ -1,5 +1,3 @@
-{-# language Safe #-}
-
 module Integer.Integer
   (
     {- * Type -} Integer,
@@ -12,8 +10,9 @@ module Integer.Integer
   )
   where
 
+import Essentials
+
 import Data.Int (Int)
-import Data.Maybe (Maybe (..))
 import Data.Word (Word)
 import Integer.Positive (Positive)
 import Integer.Signed (Signed (..))

@@ -1,5 +1,3 @@
-{-# language Safe #-}
-
 module Integer
   (
     {- ** Types -} Integer, Natural, Positive,

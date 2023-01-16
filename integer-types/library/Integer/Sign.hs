@@ -1,5 +1,3 @@
-{-# language Safe #-}
-
 module Integer.Sign
   (
     {- * Type -} Sign (..),
@@ -7,7 +5,9 @@ module Integer.Sign
   )
   where
 
-import Prelude (Eq, Ord, Show, seq, (==))
+import Essentials
+
+import Prelude (seq)
 
 import qualified Control.DeepSeq as DeepSeq
 

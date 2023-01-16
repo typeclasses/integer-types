@@ -1,14 +1,14 @@
 module Integer.Finite where
 
-import Data.Function ((.))
+import Essentials
+
 import Data.Int (Int)
-import Data.Maybe (Maybe)
 import Data.Word (Word)
 import Integer.Integer (Integer)
 import Integer.Natural (Natural)
 import Integer.Positive (Positive)
 import Integer.Signed (Signed)
-import Prelude (Bounded, Integral)
+import Prelude (Integral)
 
 import qualified Data.Maybe as Maybe
 import qualified Integer.Integer as Integer

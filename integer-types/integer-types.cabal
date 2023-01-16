@@ -34,28 +34,11 @@ common base
     build-depends:
       , base ^>= 4.16 || ^>= 4.17
       , deepseq ^>= 1.4.6
-
-common test
-    import: base
-    default-extensions:
-        AllowAmbiguousTypes
-    build-depends:
-      , exceptions ^>= 0.10.4
-      , integer-types
-
-common test-with-hedgehog
-    import: test
-    build-depends:
-      , hedgehog ^>= 1.1 || ^>= 1.2
-
-common test-with-hspec
-    import: test
-    build-depends:
-      , hspec ^>= 2.9 || ^>= 2.10
+      , quaalude ^>= 0.0
 
 library
     import: base
-    hs-source-dirs: integer-types
+    hs-source-dirs: library
     exposed-modules:
         Integer
         Integer.BoundedBelow
@@ -70,40 +53,19 @@ library
     other-modules:
         Integer.Positive.Unsafe
 
-library integer-generators
-    import: test-with-hedgehog
-    hs-source-dirs: integer-generators
-    exposed-modules: Integer.Gen
-
-test-suite test-integer-arithmetic
-    import: test-with-hedgehog
+test-suite test-integer-types
+    import: base
+    hs-source-dirs: test
     type: exitcode-stdio-1.0
+    default-extensions:
+        AllowAmbiguousTypes
+        BlockArguments
+    build-depends:
+      , exceptions ^>= 0.10.4
+      , integer-types
+      , hedgehog ^>= 1.0.5 || ^>= 1.1 || ^>= 1.2
+      , hspec ^>= 2.8.5 || ^>= 2.9 || ^>= 2.10
+      , hspec-hedgehog ^>= 0.0.1
     main-is: Main.hs
-    hs-source-dirs: test-integer-arithmetic
-    build-depends: integer-generators
-
-test-suite test-integer-conversions
-    import: test-with-hedgehog
-    type: exitcode-stdio-1.0
-    main-is: Main.hs
-    hs-source-dirs: test-integer-conversions
-    build-depends: integer-generators
-
-test-suite test-integer-enum
-    import: test-with-hspec
-    type: exitcode-stdio-1.0
-    main-is: Main.hs
-    hs-source-dirs: test-integer-enum
-
-test-suite test-integer-deepseq
-    import: test-with-hspec
-    type: exitcode-stdio-1.0
-    main-is: Main.hs
-    hs-source-dirs: test-integer-deepseq
-
-test-suite test-integer-finite
-    import: test-with-hedgehog
-    type: exitcode-stdio-1.0
-    main-is: Main.hs
-    hs-source-dirs: test-integer-finite
-    build-depends: integer-generators
+    other-modules:
+        Integer.Gen

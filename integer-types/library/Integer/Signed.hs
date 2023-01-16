@@ -1,5 +1,3 @@
-{-# language Trustworthy #-}
-
 module Integer.Signed
   (
     {- * Type -} Signed (Zero, NonZero, Plus, Minus, NotPlus, NotMinus),
@@ -12,14 +10,14 @@ module Integer.Signed
   )
   where
 
-import Data.Function (($), (.))
+import Essentials
+
 import Data.Int (Int)
-import Data.Maybe (Maybe (..))
 import Data.Word (Word)
 import Integer.Positive.Unsafe (Positive)
 import Integer.Sign (Sign (..))
 import Numeric.Natural (Natural)
-import Prelude (Enum, Eq, Integer, Integral, Num, Ord, Real, Show, seq)
+import Prelude (Integer, Integral, Num, Real, seq)
 
 import qualified Control.DeepSeq as DeepSeq
 import qualified Data.List as List

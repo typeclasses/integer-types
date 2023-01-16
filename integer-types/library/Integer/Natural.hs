@@ -1,5 +1,3 @@
-{-# language Trustworthy #-}
-
 module Integer.Natural
   (
     {- * Type -} Natural,
@@ -14,9 +12,9 @@ module Integer.Natural
   )
   where
 
-import Data.Function (($))
+import Essentials
+
 import Data.Int (Int)
-import Data.Maybe (Maybe (..))
 import Data.Word (Word)
 import Integer.Signed (Signed (..))
 import Numeric.Natural (Natural)

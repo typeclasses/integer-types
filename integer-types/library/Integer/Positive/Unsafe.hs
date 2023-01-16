@@ -1,5 +1,3 @@
-{-# language Unsafe #-}
-
 {- | This module is unsafe not merely in the sense that it contains partial
 functions, but moreover than it is capable of constructing the invalid
 'Positive' value @'FromNatural' 0@ representing zero, which is not positive.
@@ -18,10 +16,11 @@ module Integer.Positive.Unsafe
   )
   where
 
-import Data.Function (const, id, ($), (.))
+import Essentials ( ($), Enum, Eq, Ord, Show, (.), id )
+
 import Integer.BoundedBelow (BoundedBelow)
 import Numeric.Natural (Natural)
-import Prelude (Enum, Eq, Int, Integer, Integral, Num, Ord, Real, Show)
+import Prelude (Int, Integer, Integral, Num, Real)
 
 import qualified Control.DeepSeq as DeepSeq
 import qualified Control.Exception as Exception
@@ -124,8 +123,8 @@ instance BoundedBelow Positive
 instance Num Positive
   where
     abs = id
-    negate = const (Exception.throw Exception.Underflow)
-    signum = const (fromNatural 1)
+    negate = \_ -> Exception.throw Exception.Underflow
+    signum = \_ -> fromNatural 1
     fromInteger = fromIntegerChecked
     (+) = add
     (*) = multiply

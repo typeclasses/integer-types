@@ -1,5 +1,3 @@
-{-# language Safe #-}
-
 module Integer.Conversion
   (
     IntegerNarrow (narrow),
@@ -9,8 +7,8 @@ module Integer.Conversion
   )
   where
 
-import Data.Function (id, (.))
-import Data.Maybe (Maybe (..))
+import Essentials
+
 import Integer.Integer (Integer)
 import Integer.Natural (Natural)
 import Integer.Positive (Positive)

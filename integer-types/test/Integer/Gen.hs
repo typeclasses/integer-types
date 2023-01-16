@@ -6,14 +6,12 @@ module Integer.Gen
   )
   where
 
-import Control.Applicative (pure, (<*>))
-import Data.Function (id, ($))
-import Data.Functor (fmap)
+import Essentials
+
 import Data.Int (Int)
 import Data.Word (Word)
 import Integer (BoundedBelow (..), Integer, Natural, Positive, Sign (..),
                 Signed (..))
-import Text.Show (Show)
 
 import qualified Hedgehog
 import qualified Hedgehog.Gen as Gen
