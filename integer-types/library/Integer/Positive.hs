@@ -9,18 +9,21 @@ module Integer.Positive
     {- ** Int -} toInt, fromInt,
     {- ** Word -} toWord, fromWord,
     {- * One (1) -} one, addOne, subtractOne,
+    {- * List -} length,
   )
   where
 
 import Essentials
 
 import Data.Int (Int)
+import Data.List.NonEmpty (NonEmpty (..))
 import Data.Word (Word)
 import Integer.Positive.Unsafe (Positive, addOne, one, toInteger, toNatural)
 import Integer.Signed (Signed (..))
 import Numeric.Natural (Natural)
 import Prelude (Integer)
 
+import qualified Data.List as List
 import qualified Data.Ord as Ord
 import qualified Integer.Positive.Unsafe as Unsafe
 import qualified Prelude as Bounded (Bounded (..))
@@ -71,3 +74,6 @@ toSigned = Plus
 fromSigned :: Signed -> Maybe Positive
 fromSigned (Plus x) = Just x
 fromSigned _        = Nothing
+
+length :: NonEmpty a -> Positive
+length (_ :| xs) = List.foldl' (\x _ -> x Num.+ 1) 1 xs

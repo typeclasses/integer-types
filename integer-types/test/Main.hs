@@ -13,6 +13,7 @@ import Control.Exception (Exception, throw)
 import Data.Either (Either (..))
 import Data.Int (Int)
 import Data.List (take)
+import Data.List.NonEmpty (NonEmpty ((:|)))
 import Data.Word (Word)
 import Integer.Gen (GenFinite)
 import Integer.Gen (GenIntegral)
@@ -26,6 +27,8 @@ import qualified Data.Either as Either
 import qualified Data.Ord as Ord
 import qualified Hedgehog
 import qualified Integer.Gen as Gen
+import qualified Integer.Natural as Natural
+import qualified Integer.Positive as Positive
 import qualified Prelude as Bounded (Bounded (..))
 import qualified Prelude as Num (fromInteger)
 import qualified Prelude as Num (toInteger)
@@ -267,6 +270,10 @@ main = hspec do
         it "can force an error in magnitude" $ do
             x <- force (NonZero MinusSign (throw X))
             x `shouldBe` Left X
+
+    describe "length" $ do
+        it "Natural" $ Natural.length "abc" `shouldBe` 3
+        it "Positive" $ Positive.length ('a' :| "bc") `shouldBe` 3
 
 data X = X
     deriving (Eq, Show)

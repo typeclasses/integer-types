@@ -9,6 +9,7 @@ module Integer.Natural
     {- ** Int -} toInt, fromInt,
     {- ** Word -} toWord, fromWord,
     {- * One (1) -} one, addOne, subtractOne,
+    {- * List -} length,
   )
   where
 
@@ -21,6 +22,7 @@ import Numeric.Natural (Natural)
 import Integer.Positive.Unsafe (Positive)
 import Prelude (Integer)
 
+import qualified Data.List as List
 import qualified Data.Ord as Ord
 import qualified Integer.Positive as Positive
 import qualified Integer.Positive.Unsafe as Positive.Unsafe
@@ -83,3 +85,6 @@ subtractOne :: Natural -> Maybe Signed
 subtractOne x = case x of
     0 -> Nothing
     p -> Just (subtract p 1)
+
+length :: [a] -> Natural
+length = List.foldl' (\x _ -> x Num.+ 1) 0

@@ -3,6 +3,13 @@
 Change type of `Integer.Natural.addOne` from
 `Integer -> Integer` to `Natural -> Positive`
 
+New functions:
+
+```haskell
+Integer.Natural.length :: [a] -> Natural
+Integer.Positive.length :: NonEmpty a -> Positive
+```
+
 ## 0.0.0.1 (2023-01-16)
 
 Consolidate all the test suites into one
