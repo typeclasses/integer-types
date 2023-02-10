@@ -18,6 +18,7 @@ import Data.Int (Int)
 import Data.Word (Word)
 import Integer.Signed (Signed (..))
 import Numeric.Natural (Natural)
+import Integer.Positive.Unsafe (Positive)
 import Prelude (Integer)
 
 import qualified Data.Ord as Ord
@@ -27,10 +28,10 @@ import qualified Integer.Signed as Signed
 import qualified Prelude as Bounded (Bounded (..))
 import qualified Prelude as Num (Integral (..), Num (..))
 
-toPositive :: Natural -> Maybe Positive.Unsafe.Positive
+toPositive :: Natural -> Maybe Positive
 toPositive = Positive.fromNatural
 
-fromPositive :: Positive.Unsafe.Positive -> Natural
+fromPositive :: Positive -> Natural
 fromPositive = Positive.toNatural
 
 fromInteger :: Integer -> Maybe Natural
@@ -75,8 +76,8 @@ subtract a b = case Ord.compare a b of
 one :: Natural
 one = 1
 
-addOne :: Integer -> Integer
-addOne = (Num.+ 1)
+addOne :: Natural -> Positive
+addOne x = Positive.Unsafe.fromNatural (x Num.+ 1)
 
 subtractOne :: Natural -> Maybe Signed
 subtractOne x = case x of
