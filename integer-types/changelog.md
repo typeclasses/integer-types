@@ -1,3 +1,9 @@
+## 0.1.1.0 (2023-04-22)
+
+Add `Hashable` instances for `Positive`, `Sign`, and `Signed`
+
+Add `Enum` and `Bounded` instances for `Sign`
+
 ## 0.1.0.0 (2023-02-09)
 
 Change type of `Integer.Natural.addOne` from

@@ -12,6 +12,7 @@ module Integer.Signed
 
 import Essentials
 
+import Data.Hashable (Hashable (hashWithSalt))
 import Data.Int (Int)
 import Data.Word (Word)
 import Integer.Positive.Unsafe (Positive)
@@ -30,7 +31,7 @@ import qualified Prelude as Num (Integral (..), Num (..), Real (..))
 import qualified Text.Show as Show
 
 data Signed = Zero | NonZero Sign Positive
-    deriving (Eq)
+    deriving stock (Eq)
 
 instance Ord Signed where
     compare Zero Zero = Ord.EQ
@@ -48,6 +49,11 @@ instance Ord Signed where
 instance DeepSeq.NFData Signed where
     rnf Zero          = ()
     rnf (NonZero a b) = a `seq` b `seq` ()
+
+instance Hashable Signed where
+    hashWithSalt s Zero      = s `hashWithSalt` ( 0 :: Int)
+    hashWithSalt s (Plus  x) = s `hashWithSalt` ( 1 :: Int) `hashWithSalt` x
+    hashWithSalt s (Minus x) = s `hashWithSalt` (-1 :: Int) `hashWithSalt` x
 
 pattern Minus :: Positive -> Signed
 pattern Minus x = NonZero MinusSign x

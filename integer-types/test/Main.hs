@@ -276,7 +276,7 @@ main = hspec do
         it "Positive" $ Positive.length ('a' :| "bc") `shouldBe` 3
 
 data X = X
-    deriving (Eq, Show)
+    deriving stock (Eq, Show)
 
 instance Exception X
 

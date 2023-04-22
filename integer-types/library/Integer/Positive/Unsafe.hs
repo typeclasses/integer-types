@@ -18,6 +18,7 @@ module Integer.Positive.Unsafe
 
 import Essentials ( ($), Enum, Eq, Ord, Show, (.), id )
 
+import Data.Hashable (Hashable)
 import Integer.BoundedBelow (BoundedBelow)
 import Numeric.Natural (Natural)
 import Prelude (Int, Integer, Integral, Num, Real)
@@ -34,7 +35,8 @@ import qualified Prelude as Num (Integral (..), Num (..), Real (..),
                                  fromIntegral)
 import qualified Text.Show as Show
 
-newtype Positive = FromNatural{ toNatural :: Natural } deriving (Eq, Ord)
+newtype Positive = FromNatural{ toNatural :: Natural }
+    deriving newtype (Eq, Ord, Hashable)
 
 instance DeepSeq.NFData Positive where rnf (FromNatural x) = DeepSeq.rnf x
 
