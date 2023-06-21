@@ -1,33 +1,55 @@
 module Integer.Positive
-  (
-    {- * Type -} Positive,
-    {- * Subtraction -} subtract,
-    {- * Conversion -}
-    {- ** Natural -} toNatural, fromNatural,
-    {- ** Integer -} toInteger, fromInteger,
-    {- ** Signed -} toSigned, fromSigned,
-    {- ** Int -} toInt, fromInt,
-    {- ** Word -} toWord, fromWord,
-    {- * One (1) -} one, addOne, subtractOne,
-    {- * List -} length,
-  )
-  where
+  ( -- * Type
+    Positive,
 
-import Essentials
+    -- * Subtraction
+    subtract,
+
+    -- * Conversion
+
+    -- ** Natural
+    toNatural,
+    fromNatural,
+
+    -- ** Integer
+    toInteger,
+    fromInteger,
+
+    -- ** Signed
+    toSigned,
+    fromSigned,
+
+    -- ** Int
+    toInt,
+    fromInt,
+
+    -- ** Word
+    toWord,
+    fromWord,
+
+    -- * One (1)
+    one,
+    addOne,
+    subtractOne,
+
+    -- * List
+    length,
+  )
+where
 
 import Data.Int (Int)
+import Data.List qualified as List
 import Data.List.NonEmpty (NonEmpty (..))
+import Data.Ord qualified as Ord
 import Data.Word (Word)
+import Essentials
 import Integer.Positive.Unsafe (Positive, addOne, one, toInteger, toNatural)
+import Integer.Positive.Unsafe qualified as Unsafe
 import Integer.Signed (Signed (..))
 import Numeric.Natural (Natural)
 import Prelude (Integer)
-
-import qualified Data.List as List
-import qualified Data.Ord as Ord
-import qualified Integer.Positive.Unsafe as Unsafe
-import qualified Prelude as Bounded (Bounded (..))
-import qualified Prelude as Num (Integral (..), Num (..))
+import Prelude qualified as Bounded (Bounded (..))
+import Prelude qualified as Num (Integral (..), Num (..))
 
 fromInteger :: Integer -> Maybe Positive
 fromInteger x = if x Ord.> 0 then Just (Unsafe.fromInteger x) else Nothing
@@ -61,9 +83,9 @@ fromWord x = if ok then Just (Num.fromInteger x') else Nothing
 
 subtract :: Positive -> Positive -> Signed
 subtract a b = case Ord.compare a b of
-    Ord.EQ -> Zero
-    Ord.GT -> Plus  $ Unsafe.subtract a b
-    Ord.LT -> Minus $ Unsafe.subtract b a
+  Ord.EQ -> Zero
+  Ord.GT -> Plus $ Unsafe.subtract a b
+  Ord.LT -> Minus $ Unsafe.subtract b a
 
 subtractOne :: Positive -> Natural
 subtractOne x = toNatural x Num.- 1
@@ -73,7 +95,7 @@ toSigned = Plus
 
 fromSigned :: Signed -> Maybe Positive
 fromSigned (Plus x) = Just x
-fromSigned _        = Nothing
+fromSigned _ = Nothing
 
 length :: NonEmpty a -> Positive
 length (_ :| xs) = List.foldl' (\x _ -> x Num.+ 1) 1 xs

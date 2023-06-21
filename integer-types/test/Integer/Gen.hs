@@ -1,55 +1,60 @@
 module Integer.Gen
-  (
-    GenIntegral (integral),
+  ( GenIntegral (integral),
     GenFinite (finite),
     astronomical,
   )
-  where
-
-import Essentials
+where
 
 import Data.Int (Int)
 import Data.Word (Word)
-import Integer (BoundedBelow (..), Integer, Natural, Positive, Sign (..),
-                Signed (..))
-
-import qualified Hedgehog
-import qualified Hedgehog.Gen as Gen
-import qualified Hedgehog.Range as Range
-import qualified Prelude as Bounded (Bounded (..))
-import qualified Prelude as Num (Integral (..), Num (..), (+), (^))
+import Essentials
+import Hedgehog qualified
+import Hedgehog.Gen qualified as Gen
+import Hedgehog.Range qualified as Range
+import Integer
+  ( BoundedBelow (..),
+    Integer,
+    Natural,
+    Positive,
+    Sign (..),
+    Signed (..),
+  )
+import Prelude qualified as Bounded (Bounded (..))
+import Prelude qualified as Num (Integral (..), Num (..), (+), (^))
 
 ---
 
-class (Num.Integral a, Show a) => GenIntegral a
-  where
-    -- | Generators for 'Integer', 'Natural', 'Positive',
-    -- or 'Signed' selected from one of three methods:
-    --
-    -- * small numbers (magnitude less than ten)
-    -- * large numbers (well in excess of 64-bit)
-    -- * numbers at or around a bound of 'Int' or 'Word'
-    integral :: Hedgehog.Gen a
+class (Num.Integral a, Show a) => GenIntegral a where
+  -- | Generators for 'Integer', 'Natural', 'Positive',
+  -- or 'Signed' selected from one of three methods:
+  --
+  -- * small numbers (magnitude less than ten)
+  -- * large numbers (well in excess of 64-bit)
+  -- * numbers at or around a bound of 'Int' or 'Word'
+  integral :: Hedgehog.Gen a
 
-instance GenIntegral Integer  where integral = integer
-instance GenIntegral Natural  where integral = boundedBelow
+instance GenIntegral Integer where integral = integer
+
+instance GenIntegral Natural where integral = boundedBelow
+
 instance GenIntegral Positive where integral = boundedBelow
-instance GenIntegral Signed   where integral = signed
+
+instance GenIntegral Signed where integral = signed
 
 ---
 
-class (Num.Integral a, Bounded.Bounded a, Show a) => GenFinite a
-  where
-    finite :: Hedgehog.Gen a
+class (Num.Integral a, Bounded.Bounded a, Show a) => GenFinite a where
+  finite :: Hedgehog.Gen a
 
 instance GenFinite Int where finite = defaultFinite
 
 instance GenFinite Word where finite = defaultFinite
 
 defaultFinite :: (Num.Integral a, Bounded.Bounded a) => Hedgehog.Gen a
-defaultFinite = Gen.choice
-    [ Gen.integral $ Range.linear Bounded.minBound Bounded.maxBound
-    , Gen.integral $ Range.linear Bounded.maxBound Bounded.minBound
+defaultFinite =
+  Gen.choice
+    [ Gen.integral $ Range.linear Bounded.minBound Bounded.maxBound,
+      Gen.integral $ Range.linear Bounded.maxBound Bounded.minBound
     ]
 
 ---
@@ -89,13 +94,14 @@ bigBoundedBelow :: forall a. (BoundedBelow a, Num.Integral a) => Hedgehog.Gen a
 bigBoundedBelow = fmap Num.fromInteger $ Gen.integral bigRange
 
 nearPositiveFiniteBound :: forall a. Num.Integral a => Hedgehog.Gen a
-nearPositiveFiniteBound = fmap Num.fromInteger $
+nearPositiveFiniteBound =
+  fmap Num.fromInteger $
     pure (Num.+)
-    <*> Gen.element
-      [ Num.toInteger (Bounded.maxBound :: Int)
-      , Num.toInteger (Bounded.maxBound :: Word)
-      ]
-    <*> smolInteger
+      <*> Gen.element
+        [ Num.toInteger (Bounded.maxBound :: Int),
+          Num.toInteger (Bounded.maxBound :: Word)
+        ]
+      <*> smolInteger
 
 ---
 
@@ -103,9 +109,10 @@ signed :: Hedgehog.Gen Signed
 signed = Gen.choice [smolSigned, nearFiniteBoundSigned, bigSigned]
 
 smolSigned :: Hedgehog.Gen Signed
-smolSigned = Gen.frequency
-    [ (,) 1 $ pure Zero
-    , (,) 9 $ pure NonZero <*> sign <*> smolBoundedBelow
+smolSigned =
+  Gen.frequency
+    [ (,) 1 $ pure Zero,
+      (,) 9 $ pure NonZero <*> sign <*> smolBoundedBelow
     ]
 
 bigSigned :: Hedgehog.Gen Signed

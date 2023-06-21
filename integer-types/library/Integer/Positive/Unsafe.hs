@@ -1,42 +1,64 @@
-{- | This module is unsafe not merely in the sense that it contains partial
-functions, but moreover than it is capable of constructing the invalid
-'Positive' value @'FromNatural' 0@ representing zero, which is not positive.
-When a function has "checked" in its name, this indicates that it is partial but
-will never construct an invalid 'Positive'. -}
-
+-- | This module is unsafe not merely in the sense that it contains partial
+-- functions, but moreover than it is capable of constructing the invalid
+-- 'Positive' value @'FromNatural' 0@ representing zero, which is not positive.
+-- When a function has "checked" in its name, this indicates that it is partial but
+-- will never construct an invalid 'Positive'.
 module Integer.Positive.Unsafe
-  (
-    {- * Type -} Positive (FromNatural),
-    {- * Conversion -}
-    {- ** Natural -} toNatural, fromNatural, fromNaturalChecked,
-    {- ** Integer -} toInteger, fromInteger, fromIntegerChecked,
-    {- ** Int -} toInt, fromInt, fromIntChecked,
-    {- * Arithmetic -} subtract, subtractChecked,
-    {- * One (1) -} one, addOne, subtractOne, subtractOneChecked,
+  ( -- * Type
+    Positive (FromNatural),
+
+    -- * Conversion
+
+    -- ** Natural
+    toNatural,
+    fromNatural,
+    fromNaturalChecked,
+
+    -- ** Integer
+    toInteger,
+    fromInteger,
+    fromIntegerChecked,
+
+    -- ** Int
+    toInt,
+    fromInt,
+    fromIntChecked,
+
+    -- * Arithmetic
+    subtract,
+    subtractChecked,
+
+    -- * One (1)
+    one,
+    addOne,
+    subtractOne,
+    subtractOneChecked,
   )
-  where
+where
 
-import Essentials ( ($), Enum, Eq, Ord, Show, (.), id )
-
+import Control.DeepSeq qualified as DeepSeq
+import Control.Exception qualified as Exception
+import Data.Bits qualified as Bits
 import Data.Hashable (Hashable)
+import Data.List qualified as List
+import Data.Maybe qualified as Maybe
+import Data.Ord qualified as Ord
+import Essentials (Enum, Eq, Ord, Show, id, ($), (.))
 import Integer.BoundedBelow (BoundedBelow)
+import Integer.BoundedBelow qualified as BoundedBelow
 import Numeric.Natural (Natural)
+import Text.Show qualified as Show
 import Prelude (Int, Integer, Integral, Num, Real)
+import Prelude qualified as Enum (Enum (..))
+import Prelude qualified as Num
+  ( Integral (..),
+    Num (..),
+    Real (..),
+    fromIntegral,
+  )
 
-import qualified Control.DeepSeq as DeepSeq
-import qualified Control.Exception as Exception
-import qualified Data.Bits as Bits
-import qualified Data.List as List
-import qualified Data.Maybe as Maybe
-import qualified Data.Ord as Ord
-import qualified Integer.BoundedBelow as BoundedBelow
-import qualified Prelude as Enum (Enum (..))
-import qualified Prelude as Num (Integral (..), Num (..), Real (..),
-                                 fromIntegral)
-import qualified Text.Show as Show
-
-newtype Positive = FromNatural{ toNatural :: Natural }
-    deriving newtype (Eq, Ord, Hashable)
+newtype Positive = FromNatural {toNatural :: Natural}
+  deriving newtype (Eq, Ord, Hashable)
 
 instance DeepSeq.NFData Positive where rnf (FromNatural x) = DeepSeq.rnf x
 
@@ -77,7 +99,7 @@ subtractOne :: Positive -> Positive
 subtractOne = fromNatural . (Num.- 1) . toNatural
 
 subtractOneChecked :: Positive -> Positive
-subtractOneChecked x = case x of { 1 -> Exception.throw Exception.Underflow; _ -> subtractOne x }
+subtractOneChecked x = case x of 1 -> Exception.throw Exception.Underflow; _ -> subtractOne x
 
 toInt :: Positive -> Int
 toInt = Num.fromIntegral . toNatural
@@ -89,7 +111,7 @@ fromInt :: Int -> Positive
 fromInt = fromNatural . Num.fromIntegral
 
 fromIntChecked :: Int -> Positive
-fromIntChecked x = case Num.signum x of { 1 -> fromInt x; _ -> Exception.throw Exception.Underflow }
+fromIntChecked x = case Num.signum x of 1 -> fromInt x; _ -> Exception.throw Exception.Underflow
 
 enumFrom :: Positive -> [Positive]
 enumFrom = List.map fromNatural . Enum.enumFrom . toNatural
@@ -101,61 +123,59 @@ enumFromThen :: Positive -> Positive -> [Positive]
 enumFromThen a b = if a Ord.< b then ascending else descending
   where
     ascending = List.map fromNatural $ Enum.enumFromThen (toNatural a) (toNatural b)
-    descending = List.map fromInteger $ List.takeWhile (Ord.>= 1) $
-        Enum.enumFromThen (toInteger a) (toInteger b)
+    descending =
+      List.map fromInteger $
+        List.takeWhile (Ord.>= 1) $
+          Enum.enumFromThen (toInteger a) (toInteger b)
 
 enumFromThenTo :: Positive -> Positive -> Positive -> [Positive]
 enumFromThenTo a b c = if a Ord.< b then ascending else descending
   where
     ascending = List.map fromNatural $ Enum.enumFromThenTo (toNatural a) (toNatural b) (toNatural c)
-    descending = List.map fromInteger $ List.takeWhile (Ord.>= 1) $
-        Enum.enumFromThenTo (toInteger a) (toInteger b) (toInteger c)
+    descending =
+      List.map fromInteger $
+        List.takeWhile (Ord.>= 1) $
+          Enum.enumFromThenTo (toInteger a) (toInteger b) (toInteger c)
 
 type Div a = a -> a -> (a, a)
 
 divisionOp :: Div Natural -> Div Positive
 divisionOp o a b =
-    let (q, r) = o (toNatural a) (toNatural b)
-    in (fromNaturalChecked q, fromNaturalChecked r)
+  let (q, r) = o (toNatural a) (toNatural b)
+   in (fromNaturalChecked q, fromNaturalChecked r)
 
-instance BoundedBelow Positive
-  where
-    minBound = 1
+instance BoundedBelow Positive where
+  minBound = 1
 
-instance Num Positive
-  where
-    abs = id
-    negate = \_ -> Exception.throw Exception.Underflow
-    signum = \_ -> fromNatural 1
-    fromInteger = fromIntegerChecked
-    (+) = add
-    (*) = multiply
-    (-) = subtractChecked
+instance Num Positive where
+  abs = id
+  negate = \_ -> Exception.throw Exception.Underflow
+  signum = \_ -> fromNatural 1
+  fromInteger = fromIntegerChecked
+  (+) = add
+  (*) = multiply
+  (-) = subtractChecked
 
-instance Enum Positive
-  where
-    succ = addOne
-    pred = subtractOneChecked
+instance Enum Positive where
+  succ = addOne
+  pred = subtractOneChecked
 
-    fromEnum = toIntChecked
-    toEnum = fromIntChecked
+  fromEnum = toIntChecked
+  toEnum = fromIntChecked
 
-    enumFrom = enumFrom
-    enumFromTo = enumFromTo
-    enumFromThen = enumFromThen
-    enumFromThenTo = enumFromThenTo
+  enumFrom = enumFrom
+  enumFromTo = enumFromTo
+  enumFromThen = enumFromThen
+  enumFromThenTo = enumFromThenTo
 
-instance Real Positive
-  where
-    toRational = Num.toRational . toInteger
+instance Real Positive where
+  toRational = Num.toRational . toInteger
 
-instance Integral Positive
-  where
-    toInteger = toInteger
-    quotRem = divisionOp Num.quotRem
-    divMod = divisionOp Num.divMod
+instance Integral Positive where
+  toInteger = toInteger
+  quotRem = divisionOp Num.quotRem
+  divMod = divisionOp Num.divMod
 
-instance Show Positive
-  where
-    show = Show.show . toNatural
-    showsPrec i = Show.showsPrec i . toNatural
+instance Show Positive where
+  show = Show.show . toNatural
+  showsPrec i = Show.showsPrec i . toNatural

@@ -1,31 +1,45 @@
 module Integer.Integer
-  (
-    {- * Type -} Integer,
-    {- * Conversion -}
-    {- ** Positive -} toPositive, fromPositive,
-    {- ** Natural -} toNatural, fromNatural,
-    {- ** Signed -} toSigned, fromSigned,
-    {- ** Int -} toInt, fromInt,
-    {- ** Word -} toWord, fromWord,
+  ( -- * Type
+    Integer,
+
+    -- * Conversion
+
+    -- ** Positive
+    toPositive,
+    fromPositive,
+
+    -- ** Natural
+    toNatural,
+    fromNatural,
+
+    -- ** Signed
+    toSigned,
+    fromSigned,
+
+    -- ** Int
+    toInt,
+    fromInt,
+
+    -- ** Word
+    toWord,
+    fromWord,
   )
-  where
+where
 
-import Essentials
-
+import Data.Bool qualified as Bool
 import Data.Int (Int)
+import Data.Ord qualified as Ord
 import Data.Word (Word)
+import Essentials
+import Integer.Natural qualified as Natural
 import Integer.Positive (Positive)
+import Integer.Positive qualified as Positive
 import Integer.Signed (Signed (..))
+import Integer.Signed qualified as Signed
 import Numeric.Natural (Natural)
 import Prelude (Integer)
-
-import qualified Data.Bool as Bool
-import qualified Data.Ord as Ord
-import qualified Integer.Natural as Natural
-import qualified Integer.Positive as Positive
-import qualified Integer.Signed as Signed
-import qualified Prelude as Bounded (Bounded (..))
-import qualified Prelude as Num (Integral (..), Num (..))
+import Prelude qualified as Bounded (Bounded (..))
+import Prelude qualified as Num (Integral (..), Num (..))
 
 toPositive :: Integer -> Maybe Positive
 toPositive = Positive.fromInteger
@@ -48,8 +62,9 @@ fromSigned = Signed.toInteger
 toInt :: Integer -> Maybe Int
 toInt x = if ok then Just (Num.fromInteger x) else Nothing
   where
-    ok = x Ord.>= Num.toInteger (Bounded.minBound :: Int) Bool.&&
-         x Ord.<= Num.toInteger (Bounded.maxBound :: Int)
+    ok =
+      x Ord.>= Num.toInteger (Bounded.minBound :: Int)
+        Bool.&& x Ord.<= Num.toInteger (Bounded.maxBound :: Int)
 
 fromInt :: Int -> Integer
 fromInt = Num.toInteger
@@ -57,8 +72,9 @@ fromInt = Num.toInteger
 toWord :: Integer -> Maybe Word
 toWord x = if ok then Just (Num.fromInteger x) else Nothing
   where
-    ok = x Ord.>= Num.toInteger (Bounded.minBound :: Word) Bool.&&
-         x Ord.<= Num.toInteger (Bounded.maxBound :: Word)
+    ok =
+      x Ord.>= Num.toInteger (Bounded.minBound :: Word)
+        Bool.&& x Ord.<= Num.toInteger (Bounded.maxBound :: Word)
 
 fromWord :: Word -> Integer
 fromWord = Num.toInteger

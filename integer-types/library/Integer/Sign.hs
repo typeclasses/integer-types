@@ -1,28 +1,29 @@
 module Integer.Sign
-  (
-    {- * Type -} Sign (..),
-    {- * Operations -} negate, multiply,
+  ( -- * Type
+    Sign (..),
+
+    -- * Operations
+    negate,
+    multiply,
   )
-  where
+where
 
-import Essentials
-
-import Prelude (seq)
-import qualified Prelude as Enum (Enum (..))
+import Control.DeepSeq qualified as DeepSeq
 import Data.Hashable (Hashable (hashWithSalt))
-
-import qualified Control.DeepSeq as DeepSeq
+import Essentials
+import Prelude (seq)
+import Prelude qualified as Enum (Enum (..))
 
 data Sign = MinusSign | PlusSign
-    deriving stock (Eq, Ord, Show, Enum, Bounded)
+  deriving stock (Eq, Ord, Show, Enum, Bounded)
 
 instance DeepSeq.NFData Sign where rnf x = seq x ()
 
 instance Hashable Sign where
-    hashWithSalt salt x = salt `hashWithSalt` (Enum.fromEnum x)
+  hashWithSalt salt x = salt `hashWithSalt` (Enum.fromEnum x)
 
 negate :: Sign -> Sign
-negate PlusSign  = MinusSign
+negate PlusSign = MinusSign
 negate MinusSign = PlusSign
 
 multiply :: Sign -> Sign -> Sign
