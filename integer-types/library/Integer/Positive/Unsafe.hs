@@ -38,17 +38,19 @@ where
 
 import Control.DeepSeq qualified as DeepSeq
 import Control.Exception qualified as Exception
+import Control.Monad.Fail (fail)
 import Data.Bits qualified as Bits
 import Data.Hashable (Hashable)
 import Data.List qualified as List
 import Data.Maybe qualified as Maybe
 import Data.Ord qualified as Ord
-import Essentials (Enum, Eq, Ord, Show, id, ($), (.))
+import Essentials
 import Integer.BoundedBelow (BoundedBelow)
 import Integer.BoundedBelow qualified as BoundedBelow
 import Numeric.Natural (Natural)
+import Text.Read qualified as Read
 import Text.Show qualified as Show
-import Prelude (Int, Integer, Integral, Num, Real)
+import Prelude (Int, Integer, Integral, Num, Read, Real)
 import Prelude qualified as Enum (Enum (..))
 import Prelude qualified as Num
   ( Integral (..),
@@ -179,3 +181,13 @@ instance Integral Positive where
 instance Show Positive where
   show = Show.show . toNatural
   showsPrec i = Show.showsPrec i . toNatural
+
+instance Read Positive where
+  readsPrec i = do
+    xs <- Read.readsPrec @Natural i
+    pure $ xs & Maybe.mapMaybe \case
+      (0, _) -> Nothing
+      (n, s) -> Just (fromNatural n, s)
+  readPrec = do
+    n <- Read.readPrec @Natural
+    if n == 0 then fail "0" else pure $ fromNatural n

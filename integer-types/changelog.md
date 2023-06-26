@@ -1,3 +1,7 @@
+## 0.1.2.0 (2023-06-26)
+
+Add `Read` instance for `Positive`
+
 ## 0.1.1.0 (2023-04-22)
 
 Add `Hashable` instances for `Positive`, `Sign`, and `Signed`

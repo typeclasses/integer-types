@@ -1,7 +1,7 @@
 cabal-version: 3.0
 
 name: integer-types
-version: 0.1.1.0
+version: 0.1.2.0
 
 category: Numeric
 synopsis: Integer, Natural, and Positive
@@ -26,7 +26,9 @@ common base
     default-language: GHC2021
     ghc-options: -Wall
     default-extensions:
+        BlockArguments
         DerivingStrategies
+        LambdaCase
         NoImplicitPrelude
         PatternSynonyms
         ViewPatterns
