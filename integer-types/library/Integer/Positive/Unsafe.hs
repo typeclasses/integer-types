@@ -185,9 +185,10 @@ instance Show Positive where
 instance Read Positive where
   readsPrec i = do
     xs <- Read.readsPrec @Natural i
-    pure $ xs & Maybe.mapMaybe \case
-      (0, _) -> Nothing
-      (n, s) -> Just (fromNatural n, s)
+    pure $
+      xs & Maybe.mapMaybe \case
+        (0, _) -> Nothing
+        (n, s) -> Just (fromNatural n, s)
   readPrec = do
     n <- Read.readPrec @Natural
     if n == 0 then fail "0" else pure $ fromNatural n
