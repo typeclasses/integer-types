@@ -23,6 +23,17 @@ module Integer.Signed
     -- ** Word
     toWord,
     fromWord,
+
+    -- * Arithmetic
+
+    -- ** Increase
+    increase,
+    strictlyIncrease,
+
+    -- ** One (1)
+    one,
+    addOne,
+    subtractOne,
   )
 where
 
@@ -107,6 +118,33 @@ toNatural :: Signed -> Maybe Natural
 toNatural (Minus _) = Nothing
 toNatural Zero = Just 0
 toNatural (Plus x) = Just (Positive.Unsafe.toNatural x)
+
+one :: Signed
+one = Plus Positive.Unsafe.one
+
+addOne :: Signed -> Signed
+addOne Zero = one
+addOne (Minus 1) = Zero
+addOne (Minus n) = Minus (Positive.Unsafe.subtractOne n)
+addOne (Plus n) = Plus (Positive.Unsafe.addOne n)
+
+subtractOne :: Signed -> Signed
+subtractOne Zero = Minus 1
+subtractOne (Plus 1) = Zero
+subtractOne (Plus n) = Plus (Positive.Unsafe.subtractOne n)
+subtractOne (Minus n) = Minus (Positive.Unsafe.addOne n)
+
+increase :: Natural -> Signed -> Signed
+increase 0 x = x
+increase n x = strictlyIncrease (Positive.Unsafe.fromNatural n) x
+
+strictlyIncrease :: Positive -> Signed -> Signed
+strictlyIncrease a Zero = Plus a
+strictlyIncrease a (Plus b) = Plus ((Num.+) a b)
+strictlyIncrease a (Minus b) = case Ord.compare a b of
+  Ord.EQ -> Zero
+  Ord.LT -> Minus $ Positive.Unsafe.subtract b a
+  Ord.GT -> Plus $ Positive.Unsafe.subtract a b
 
 add :: Signed -> Signed -> Signed
 add Zero x = x

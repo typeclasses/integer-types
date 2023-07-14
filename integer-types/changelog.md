@@ -1,3 +1,19 @@
+## 0.1.3.0 (2023-07-14)
+
+Added modules `Integer.Increase`, `Integer.StrictlyIncrease`
+
+Added classes to the `Integer` module:
+`Increase (increase)`, `StrictlyIncrease (strictlyIncrease)`
+
+Added to the `Integer.Integer` module: `increase`, `strictlyIncrease`
+
+Added to the `Integer.Natural` module: `strictlyIncrease`
+
+Added to the `Integer.Positive` module: `increase`
+
+Added to the `Integer.Signed` module: `increase`, `strictlyIncrease`,
+`one`, `addOne`, `subtractOne`
+
 ## 0.1.2.0 (2023-06-26)
 
 Add `Read` instance for `Positive`

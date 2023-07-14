@@ -23,6 +23,12 @@ module Integer.Integer
     -- ** Word
     toWord,
     fromWord,
+
+    -- * Arithmetic
+
+    -- ** Increase
+    increase,
+    strictlyIncrease,
   )
 where
 
@@ -78,3 +84,9 @@ toWord x = if ok then Just (Num.fromInteger x) else Nothing
 
 fromWord :: Word -> Integer
 fromWord = Num.toInteger
+
+increase :: Natural -> Integer -> Integer
+increase n = (Num.+) (fromNatural n)
+
+strictlyIncrease :: Positive -> Integer -> Integer
+strictlyIncrease n = (Num.+) (fromPositive n)

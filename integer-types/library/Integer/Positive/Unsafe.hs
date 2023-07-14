@@ -25,10 +25,15 @@ module Integer.Positive.Unsafe
     fromIntChecked,
 
     -- * Arithmetic
+
+    -- ** Subtraction
     subtract,
     subtractChecked,
 
-    -- * One (1)
+    -- ** Increase
+    increase,
+
+    -- ** One (1)
     one,
     addOne,
     subtractOne,
@@ -102,6 +107,9 @@ subtractOne = fromNatural . (Num.- 1) . toNatural
 
 subtractOneChecked :: Positive -> Positive
 subtractOneChecked x = case x of 1 -> Exception.throw Exception.Underflow; _ -> subtractOne x
+
+increase :: Natural -> Positive -> Positive
+increase n = fromNatural . (Num.+ n) . toNatural
 
 toInt :: Positive -> Int
 toInt = Num.fromIntegral . toNatural

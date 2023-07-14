@@ -2,9 +2,6 @@ module Integer.Positive
   ( -- * Type
     Positive,
 
-    -- * Subtraction
-    subtract,
-
     -- * Conversion
 
     -- ** Natural
@@ -27,7 +24,15 @@ module Integer.Positive
     toWord,
     fromWord,
 
-    -- * One (1)
+    -- * Arithmetic
+
+    -- ** Subtraction
+    subtract,
+
+    -- ** Increase
+    increase,
+
+    -- ** One (1)
     one,
     addOne,
     subtractOne,
@@ -43,7 +48,7 @@ import Data.List.NonEmpty (NonEmpty (..))
 import Data.Ord qualified as Ord
 import Data.Word (Word)
 import Essentials
-import Integer.Positive.Unsafe (Positive, addOne, one, toInteger, toNatural)
+import Integer.Positive.Unsafe (Positive, addOne, increase, one, toInteger, toNatural)
 import Integer.Positive.Unsafe qualified as Unsafe
 import Integer.Signed (Signed (..))
 import Numeric.Natural (Natural)

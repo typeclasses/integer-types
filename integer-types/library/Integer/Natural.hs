@@ -2,9 +2,6 @@ module Integer.Natural
   ( -- * Type
     Natural,
 
-    -- * Subtraction
-    subtract,
-
     -- * Conversion
 
     -- ** Positive
@@ -27,7 +24,15 @@ module Integer.Natural
     toWord,
     fromWord,
 
-    -- * One (1)
+    -- * Arithmetic
+
+    -- ** Subtraction
+    subtract,
+
+    -- ** Increase
+    strictlyIncrease,
+
+    -- ** One (1)
     one,
     addOne,
     subtractOne,
@@ -110,3 +115,6 @@ subtractOne x = case x of
 
 length :: [a] -> Natural
 length = List.foldl' (\x _ -> x Num.+ 1) 0
+
+strictlyIncrease :: Positive -> Natural -> Natural
+strictlyIncrease p n = Positive.toNatural p Num.+ n

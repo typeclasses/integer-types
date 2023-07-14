@@ -19,24 +19,39 @@ import Integer.Gen (GenFinite, GenIntegral)
 import Integer.Gen qualified as Gen
 import Integer.Natural qualified as Natural
 import Integer.Positive qualified as Positive
+import Integer.Signed qualified as Signed
 import System.IO (IO)
-import Test.Hspec (describe, hspec, it, shouldBe)
-import Test.Hspec.Hedgehog
-  ( evalMaybe,
-    hedgehog,
-    modifyMaxSuccess,
-    (===),
-  )
+import Test.Hspec (context, hspec, it, shouldBe)
+import Test.Hspec.Hedgehog (evalMaybe, hedgehog, modifyMaxSuccess, (===))
 import Prelude (Num, fromInteger, toInteger, ($!), (*), (+), (-))
 import Prelude qualified as Bounded (Bounded (..))
 import Prelude qualified as Num (fromInteger, toInteger)
 
 main :: IO ()
 main = hspec do
-  describe
-    "Closed Num operations op behaves the same in A \
-    \as in Integer"
-    $ modifyMaxSuccess (\_ -> 1000) do
+  context "addOne in A behaves the same as (+ 1) in Integer" do
+    modifyMaxSuccess (\_ -> 1000) do
+      it "A = Natural" $ hedgehog do
+        x :: Natural <- Hedgehog.forAll Gen.integral
+        toInteger (Natural.addOne x) === toInteger x + 1
+      it "A = Positive" $ hedgehog do
+        x :: Positive <- Hedgehog.forAll Gen.integral
+        toInteger (Positive.addOne x) === toInteger x + 1
+      it "A = Signed" $ hedgehog do
+        x :: Signed <- Hedgehog.forAll Gen.integral
+        toInteger (Signed.addOne x) === toInteger x + 1
+
+  context "subtractOne in A behaves the same as (- 1) in Integer" do
+    modifyMaxSuccess (\_ -> 1000) do
+      it "A = Positive" $ hedgehog do
+        x :: Positive <- Hedgehog.forAll Gen.integral
+        toInteger (Positive.subtractOne x) === toInteger x - 1
+      it "A = Signed" $ hedgehog do
+        x :: Signed <- Hedgehog.forAll Gen.integral
+        toInteger (Signed.subtractOne x) === toInteger x - 1
+
+  context "Closed Num operations op behaves the same in A as in Integer" do
+    modifyMaxSuccess (\_ -> 1000) do
       let check ::
             forall a m.
             GenIntegral a =>
@@ -53,9 +68,8 @@ main = hspec do
       it "op = (*), A = Positive" $ hedgehog $ check @Positive (*)
       it "op = (*), A = Signed" $ hedgehog $ check @Signed (*)
 
-  describe
-    "subtract in A behaves the same as (-) in B"
-    $ modifyMaxSuccess (\_ -> 1000) do
+  context "subtract in A behaves the same as (-) in B" do
+    modifyMaxSuccess (\_ -> 1000) do
       let check ::
             forall a b m.
             (GenIntegral a, Subtraction a, Subtraction' b, Num b) =>
@@ -73,10 +87,8 @@ main = hspec do
       it "A = Positive, B = Signed" $ hedgehog $ check @Positive @Signed
       it "A = Positive, B = Integer" $ hedgehog $ check @Positive @Integer
 
-  describe
-    "(-) in A behaves the same as (-) in Integer if the result \
-    \is in A, undefined otherwise"
-    $ modifyMaxSuccess (\_ -> 1000) do
+  context "(-) in A behaves the same as (-) in Integer if the result is in A, undefined otherwise" do
+    modifyMaxSuccess (\_ -> 1000) do
       let check ::
             forall a m.
             (GenIntegral a, Subtraction a, IntegerNarrow Integer a) =>
@@ -93,7 +105,41 @@ main = hspec do
 
       it "A = Positive" $ hedgehog $ check @Positive
 
-  describe "convert (convert x) = x" do
+  context "increase in A behaves the same as (+) in Integer" do
+    modifyMaxSuccess (\_ -> 1000) do
+      let check ::
+            forall a m.
+            (GenIntegral a, Increase a) =>
+            Exception.MonadCatch m =>
+            Hedgehog.PropertyT m ()
+          check = do
+            x :: Natural <- Hedgehog.forAll Gen.integral
+            y :: a <- Hedgehog.forAll Gen.integral
+            toInteger (increase x y) === toInteger x + toInteger y
+
+      it "A = Natural" $ hedgehog $ check @Natural
+      it "A = Integer" $ hedgehog $ check @Integer
+      it "A = Positive" $ hedgehog $ check @Positive
+      it "A = Signed" $ hedgehog $ check @Signed
+
+  context "strictlyIncrease in A behaves the same as (+) in Integer" do
+    modifyMaxSuccess (\_ -> 1000) do
+      let check ::
+            forall a m.
+            (GenIntegral a, StrictlyIncrease a) =>
+            Exception.MonadCatch m =>
+            Hedgehog.PropertyT m ()
+          check = do
+            x :: Positive <- Hedgehog.forAll Gen.integral
+            y :: a <- Hedgehog.forAll Gen.integral
+            toInteger (strictlyIncrease x y) === toInteger x + toInteger y
+
+      it "A = Natural" $ hedgehog $ check @Natural
+      it "A = Integer" $ hedgehog $ check @Integer
+      it "A = Positive" $ hedgehog $ check @Positive
+      it "A = Signed" $ hedgehog $ check @Signed
+
+  context "convert (convert x) = x" do
     let check ::
           forall a b m.
           (GenIntegral a, IntegerEquiv a b) =>
@@ -106,26 +152,25 @@ main = hspec do
     it "A = Integer, B = Signed" $ hedgehog $ check @Integer @Signed
     it "A = Signed,  B = Integer" $ hedgehog $ check @Signed @Integer
 
-  describe "narrow (convert x) = Just x" $ modifyMaxSuccess (\_ -> 1000) do
-    let check ::
-          forall a b m.
-          (GenIntegral a, IntegerConvert a b, IntegerNarrow b a) =>
-          Monad m =>
-          Hedgehog.PropertyT m ()
-        check = do
-          x :: a <- Hedgehog.forAll Gen.integral
-          narrow (convert x :: b) === Just x
+  context "narrow (convert x) = Just x" do
+    modifyMaxSuccess (\_ -> 1000) do
+      let check ::
+            forall a b m.
+            (GenIntegral a, IntegerConvert a b, IntegerNarrow b a) =>
+            Monad m =>
+            Hedgehog.PropertyT m ()
+          check = do
+            x :: a <- Hedgehog.forAll Gen.integral
+            narrow (convert x :: b) === Just x
 
-    it "A = Natural,  B = Integer" $ hedgehog $ check @Natural @Integer
-    it "A = Natural,  B = Signed" $ hedgehog $ check @Natural @Signed
-    it "A = Positive, B = Integer" $ hedgehog $ check @Positive @Integer
-    it "A = Positive, B = Signed" $ hedgehog $ check @Positive @Signed
-    it "A = Positive, B = Natural" $ hedgehog $ check @Positive @Natural
+      it "A = Natural,  B = Integer" $ hedgehog $ check @Natural @Integer
+      it "A = Natural,  B = Signed" $ hedgehog $ check @Natural @Signed
+      it "A = Positive, B = Integer" $ hedgehog $ check @Positive @Integer
+      it "A = Positive, B = Signed" $ hedgehog $ check @Positive @Signed
+      it "A = Positive, B = Natural" $ hedgehog $ check @Positive @Natural
 
-  describe
-    "narrow x = (Just y | convert y = x) \
-    \or Nothing"
-    $ modifyMaxSuccess (\_ -> 1000) do
+  context "narrow x = (Just y | convert y = x) or Nothing" do
+    modifyMaxSuccess (\_ -> 1000) do
       let check ::
             forall a b m.
             (GenIntegral a, BoundedBelow b) =>
@@ -148,7 +193,7 @@ main = hspec do
       it "A = Signed,  B = Positive" $ hedgehog $ check @Signed @Positive
       it "A = Natural, B = Positive" $ hedgehog $ check @Natural @Positive
 
-  describe "yolo (yolo x) = x, if Integer x is in range of A" do
+  context "yolo (yolo x) = x, if Integer x is in range of A" do
     let check ::
           forall a m.
           (GenIntegral a, BoundedBelow a) =>
@@ -166,10 +211,8 @@ main = hspec do
     it "A = Positive" $ hedgehog $ check @Positive
     it "A = Natural " $ hedgehog $ check @Natural
 
-  describe
-    "toFinite x = (Just y | fromInteger y = x) \
-    \or Nothing"
-    $ modifyMaxSuccess (\_ -> 1000) do
+  context "toFinite x = (Just y | fromInteger y = x) or Nothing" $
+    modifyMaxSuccess (\_ -> 1000) do
       let check ::
             forall a b m.
             Monad m =>
@@ -194,7 +237,7 @@ main = hspec do
       it "A = Signed,   B = Int " $ hedgehog $ check @Signed @Int
       it "A = Signed,   B = Word" $ hedgehog $ check @Signed @Word
 
-  describe "fromFinite x = narrow (toInteger x)" do
+  context "fromFinite x = narrow (toInteger x)" do
     let check ::
           forall a b m.
           Monad m =>
@@ -214,87 +257,93 @@ main = hspec do
     it "A = Int,  B = Signed " $ hedgehog $ check @Signed @Int
     it "A = Word, B = Signed" $ hedgehog $ check @Signed @Word
 
-  describe "Enum @Positive" $ do
-    describe "[a ..]" $ do
-      it "counts upward" $
-        take 3 [5 :: Positive ..] `shouldBe` [5, 6, 7]
-      it "can start with 1" $
-        take 3 [1 :: Positive ..] `shouldBe` [1, 2, 3]
+  context "Enum @Positive" do
+    let (~>) = shouldBe @[Positive]
 
-    describe "[a .. b]" $ do
-      it "counts upward" $
-        [5 .. 8 :: Positive] `shouldBe` [5, 6, 7, 8]
-      it "can start with 1" $
-        [1 .. 5 :: Positive] `shouldBe` [1, 2, 3, 4, 5]
-      it "does not count downward" $ do
-        [8 .. 5 :: Positive] `shouldBe` []
-        [8 .. 7 :: Positive] `shouldBe` []
-      it "can return 1 item" $ do
-        [3 .. 3 :: Positive] `shouldBe` [3]
-        [1 .. 1 :: Positive] `shouldBe` [1]
+    context "[a ..]" do
+      it "counts upward" do
+        take 3 [5 ..] ~> [5, 6, 7]
+      it "can start with 1" do
+        take 3 [1 ..] ~> [1, 2, 3]
 
-    describe "[a, b ..]" $ do
-      it "can count upward by 1" $ do
-        take 5 [5, 6 :: Positive ..] `shouldBe` [5, 6, 7, 8, 9]
-        take 5 [1, 2 :: Positive ..] `shouldBe` [1, 2, 3, 4, 5]
-      it "can count downward by 1" $
-        [5, 4 :: Positive ..] `shouldBe` [5, 4, 3, 2, 1]
-      it "can count upward by 2" $ do
-        take 5 [5, 7 :: Positive ..] `shouldBe` [5, 7, 9, 11, 13]
-        take 5 [1, 3 :: Positive ..] `shouldBe` [1, 3, 5, 7, 9]
-      it "can count downward by 2" $
-        [9, 7 :: Positive ..] `shouldBe` [9, 7, 5, 3, 1]
-      it "can count downward by 2 without exactly reaching its lower bound" $
-        [8, 6 :: Positive ..] `shouldBe` [8, 6, 4, 2]
-      it "can repeat 1 item indefinitely" $
-        take 5 [4, 4 :: Positive ..] `shouldBe` [4, 4, 4, 4, 4]
+    context "[a .. b]" do
+      it "counts upward" do
+        [5 .. 8] ~> [5, 6, 7, 8]
+      it "can start with 1" do
+        [1 .. 5] ~> [1, 2, 3, 4, 5]
+      it "does not count downward" do
+        [8 .. 5] ~> []
+        [8 .. 7] ~> []
+      it "can return 1 item" do
+        [3 .. 3] ~> [3]
+        [1 .. 1] ~> [1]
 
-    describe "[a, b .. c]" $ do
-      it "can count upward by 1" $ do
-        [5, 6 .. 9 :: Positive] `shouldBe` [5, 6, 7, 8, 9]
-        [1, 2 .. 5 :: Positive] `shouldBe` [1, 2, 3, 4, 5]
-      it "can count downward by 1" $
-        [9, 8 .. 5 :: Positive] `shouldBe` [9, 8, 7, 6, 5]
-      it "can count upward by 2" $ do
-        [5, 7 .. 11 :: Positive] `shouldBe` [5, 7, 9, 11]
-        [1, 3 .. 7 :: Positive] `shouldBe` [1, 3, 5, 7]
-      it "can count upward without exactly reaching its upper bound" $
-        [5, 7 .. 12 :: Positive] `shouldBe` [5, 7, 9, 11]
-      it "can count downward by 2" $
-        [11, 9 .. 5 :: Positive] `shouldBe` [11, 9, 7, 5]
-      it "can count downward by 2 without exactly reaching its lower bound" $
-        [11, 9 .. 4 :: Positive] `shouldBe` [11, 9, 7, 5]
-      it "can count downward with a lower bound of 1" $ do
-        [7, 5 .. 1 :: Positive] `shouldBe` [7, 5, 3, 1]
-        [8, 6 .. 1 :: Positive] `shouldBe` [8, 6, 4, 2]
-      it "can repeat 1 item indefinitely" $ do
-        take 5 [4, 4 .. 9 :: Positive] `shouldBe` [4, 4, 4, 4, 4]
-        take 5 [4, 4 .. 4 :: Positive] `shouldBe` [4, 4, 4, 4, 4]
-      it "can return 1 item" $ do
-        [4, 5 .. 4 :: Positive] `shouldBe` [4]
-        [4, 3 .. 4 :: Positive] `shouldBe` [4]
-      it "can return an empty list" $ do
-        [4, 4 .. 3 :: Positive] `shouldBe` []
-        [4, 5 .. 3 :: Positive] `shouldBe` []
-        [5, 4 .. 6 :: Positive] `shouldBe` []
+    context "[a, b ..]" do
+      it "can count upward by 1" do
+        take 5 [5, 6 ..] ~> [5, 6, 7, 8, 9]
+        take 5 [1, 2 ..] ~> [1, 2, 3, 4, 5]
+      it "can count downward by 1" do
+        [5, 4 ..] ~> [5, 4, 3, 2, 1]
+      it "can count upward by 2" do
+        take 5 [5, 7 ..] ~> [5, 7, 9, 11, 13]
+        take 5 [1, 3 ..] ~> [1, 3, 5, 7, 9]
+      it "can count downward by 2" do
+        [9, 7 ..] ~> [9, 7, 5, 3, 1]
+      it "can count downward by 2 without exactly reaching its lower bound" do
+        [8, 6 ..] ~> [8, 6, 4, 2]
+      it "can repeat 1 item indefinitely" do
+        take 5 [4, 4 ..] ~> [4, 4, 4, 4, 4]
 
-  describe "deepseq @Signed" $ do
-    it "can succeed" $ do
+    context "[a, b .. c]" do
+      it "can count upward by 1" do
+        [5, 6 .. 9] ~> [5, 6, 7, 8, 9]
+        [1, 2 .. 5] ~> [1, 2, 3, 4, 5]
+      it "can count downward by 1" do
+        [9, 8 .. 5] ~> [9, 8, 7, 6, 5]
+      it "can count upward by 2" do
+        [5, 7 .. 11] ~> [5, 7, 9, 11]
+        [1, 3 .. 7] ~> [1, 3, 5, 7]
+      it "can count upward without exactly reaching its upper bound" do
+        [5, 7 .. 12] ~> [5, 7, 9, 11]
+      it "can count downward by 2" do
+        [11, 9 .. 5] ~> [11, 9, 7, 5]
+      it "can count downward by 2 without exactly reaching its lower bound" do
+        [11, 9 .. 4] ~> [11, 9, 7, 5]
+      it "can count downward with a lower bound of 1" do
+        [7, 5 .. 1] ~> [7, 5, 3, 1]
+        [8, 6 .. 1] ~> [8, 6, 4, 2]
+      it "can repeat 1 item indefinitely" do
+        take 5 [4, 4 .. 9] ~> [4, 4, 4, 4, 4]
+        take 5 [4, 4 .. 4] ~> [4, 4, 4, 4, 4]
+      it "can return 1 item" do
+        [4, 5 .. 4] ~> [4]
+        [4, 3 .. 4] ~> [4]
+      it "can return an empty list" do
+        [4, 4 .. 3] ~> []
+        [4, 5 .. 3] ~> []
+        [5, 4 .. 6] ~> []
+
+  context "deepseq @Signed" do
+    let (~>) = shouldBe @(Either X Signed)
+
+    it "can succeed" do
       x <- force (NonZero MinusSign 5)
-      x `shouldBe` Right (-5)
-    it "can force an error" $ do
-      x <- force (throw X :: Signed)
-      x `shouldBe` Left X
-    it "can force an error in sign" $ do
+      x ~> Right (-5)
+    it "can force an error" do
+      x <- force (throw X)
+      x ~> Left X
+    it "can force an error in sign" do
       x <- force (NonZero (throw X) 5)
-      x `shouldBe` Left X
-    it "can force an error in magnitude" $ do
+      x ~> Left X
+    it "can force an error in magnitude" do
       x <- force (NonZero MinusSign (throw X))
-      x `shouldBe` Left X
+      x ~> Left X
 
-  describe "length" $ do
-    it "Natural" $ Natural.length "abc" `shouldBe` 3
-    it "Positive" $ Positive.length ('a' :| "bc") `shouldBe` 3
+  context "length" do
+    it "Natural" do
+      Natural.length "abc" `shouldBe` 3
+    it "Positive" do
+      Positive.length ('a' :| "bc") `shouldBe` 3
 
 data X = X
   deriving stock (Eq, Show)

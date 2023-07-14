@@ -6,6 +6,10 @@ module Integer
     Signed (Zero, NonZero, Minus, Plus),
     Sign (MinusSign, PlusSign),
 
+    -- ** Addition
+    Increase (increase),
+    StrictlyIncrease (strictlyIncrease),
+
     -- ** Subtraction
     Subtraction (subtractInteger, subtractSigned),
     Subtraction' (subtract),
@@ -34,11 +38,13 @@ import Integer.Finite
   ( ConvertWithFinite (fromInt, fromWord, toInt, toWord),
     Finite (..),
   )
+import Integer.Increase (Increase (increase))
 import Integer.Integer (Integer)
 import Integer.Natural (Natural)
 import Integer.Positive (Positive)
 import Integer.Sign (Sign (MinusSign, PlusSign))
 import Integer.Signed (Signed (Minus, NonZero, Plus, Zero))
+import Integer.StrictlyIncrease (StrictlyIncrease (strictlyIncrease))
 import Integer.Subtraction
   ( Subtraction (subtractInteger, subtractSigned),
     Subtraction' (subtract),
