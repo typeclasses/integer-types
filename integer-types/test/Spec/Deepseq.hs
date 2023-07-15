@@ -6,13 +6,11 @@ import Control.Monad.Catch qualified as Exception (MonadCatch, try)
 import Data.Either (Either (..))
 import Essentials
 import Integer (Sign (MinusSign), Signed (NonZero))
-import Test.Hspec (Spec, context, it, shouldBe)
+import Test.Hspec (Expectation, Spec, context, it, shouldBe)
 
 spec :: Spec
 spec =
   context "deepseq @Signed" do
-    let (~>) = shouldBe @(Either X Signed)
-
     it "can succeed" do
       x <- force (NonZero MinusSign 5)
       x ~> Right (-5)
@@ -25,6 +23,9 @@ spec =
     it "can force an error in magnitude" do
       x <- force (NonZero MinusSign (throw X))
       x ~> Left X
+
+(~>) :: Either X Signed -> Either X Signed -> Expectation
+(~>) = shouldBe @(Either X Signed)
 
 data X = X
   deriving stock (Eq, Show)

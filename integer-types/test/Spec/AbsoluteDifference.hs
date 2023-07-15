@@ -1,12 +1,25 @@
 module Spec.AbsoluteDifference where
 
 import Essentials
-import Hedgehog qualified
-import Integer (AbsoluteDifference, Integer, Natural, Positive, Signed, absoluteDifference, yolo)
+import Integer
+  ( AbsoluteDifference,
+    Integer,
+    Natural,
+    Positive,
+    Signed,
+    absoluteDifference,
+    yolo,
+  )
 import Integer.Gen (GenIntegral)
 import Integer.Gen qualified as Gen
 import Test.Hspec (Spec, context, it)
-import Test.Hspec.Hedgehog (hedgehog, modifyMaxSuccess, (===))
+import Test.Hspec.Hedgehog
+  ( PropertyT,
+    forAll,
+    hedgehog,
+    modifyMaxSuccess,
+    (===),
+  )
 import Prelude (toInteger, (-))
 
 spec :: Spec
@@ -30,14 +43,12 @@ spec =
       it "A = Positive, B = Integer" $ hedgehog $ check @Positive @Integer
       it "A = Integer, B = Positive" $ hedgehog $ check @Integer @Positive
 
-check ::
-  forall a b m.
-  (GenIntegral a, GenIntegral b, AbsoluteDifference a b) =>
-  Monad m =>
-  Hedgehog.PropertyT m ()
+type AB a b = (GenIntegral a, GenIntegral b, AbsoluteDifference a b)
+
+check :: forall a b m. (AB a b) => Monad m => PropertyT m ()
 check = do
-  x :: a <- Hedgehog.forAll Gen.integral
-  y :: b <- Hedgehog.forAll Gen.integral
+  x :: a <- forAll Gen.integral
+  y :: b <- forAll Gen.integral
   absoluteDifference x y === reference (toInteger x) (toInteger y)
 
 reference :: Integer -> Integer -> Natural

@@ -2,13 +2,14 @@ module Spec.Enum where
 
 import Data.List (take)
 import Integer (Positive)
-import Test.Hspec (Spec, context, it, shouldBe)
+import Test.Hspec (Expectation, Spec, context, it, shouldBe)
+
+(~>) :: [Positive] -> [Positive] -> Expectation
+(~>) = shouldBe @[Positive]
 
 spec :: Spec
 spec =
   context "Enum @Positive" do
-    let (~>) = shouldBe @[Positive]
-
     context "[a ..]" do
       it "counts upward" do
         take 3 [5 ..] ~> [5, 6, 7]
