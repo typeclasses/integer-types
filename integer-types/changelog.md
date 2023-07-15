@@ -4,6 +4,8 @@ Added module `Integer.AbsoluteDifference`
 
 Added to the `Integer` module: `AbsoluteDifference (absoluteDifference)`
 
+Date: 2023-07-15
+
 ## 0.1.3.0
 
 Added modules `Integer.Increase`, `Integer.StrictlyIncrease`
