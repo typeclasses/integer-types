@@ -1,3 +1,9 @@
+## 0.1.4.0
+
+Added module `Integer.AbsoluteDifference`
+
+Added to the `Integer` module: `AbsoluteDifference (absoluteDifference)`
+
 ## 0.1.3.0
 
 Added modules `Integer.Increase`, `Integer.StrictlyIncrease`

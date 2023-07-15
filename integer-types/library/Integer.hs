@@ -13,6 +13,7 @@ module Integer
     -- ** Subtraction
     Subtraction (subtractInteger, subtractSigned),
     Subtraction' (subtract),
+    AbsoluteDifference (absoluteDifference),
 
     -- ** Conversion
     IntegerNarrow (narrow),
@@ -27,6 +28,9 @@ module Integer
   )
 where
 
+import Integer.AbsoluteDifference
+  ( AbsoluteDifference (absoluteDifference),
+  )
 import Integer.BoundedBelow (BoundedBelow (minBound))
 import Integer.Conversion
   ( IntegerConvert (convert),

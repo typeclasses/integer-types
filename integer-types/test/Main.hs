@@ -1,5 +1,6 @@
 module Main (main) where
 
+import Spec.AbsoluteDifference qualified
 import Spec.AddOne qualified
 import Spec.Addition qualified
 import Spec.Conversion qualified
@@ -17,6 +18,7 @@ import Test.Hspec (hspec)
 
 main :: IO ()
 main = hspec do
+  Spec.AbsoluteDifference.spec
   Spec.Addition.spec
   Spec.AddOne.spec
   Spec.Conversion.spec
