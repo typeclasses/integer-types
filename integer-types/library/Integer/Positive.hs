@@ -32,6 +32,12 @@ module Integer.Positive
     -- ** Increase
     increase,
 
+    -- ** Division
+    divide,
+    quotient,
+    remainder,
+    greatestCommonFactor,
+
     -- ** One (1)
     one,
     addOne,
@@ -104,3 +110,19 @@ fromSigned _ = Nothing
 
 length :: NonEmpty a -> Positive
 length (_ :| xs) = List.foldl' (\x _ -> x Num.+ 1) 1 xs
+
+-- | 'quotient' and 'remainder'
+divide :: Positive -> Positive -> (Natural, Natural)
+divide a b = Num.quotRem (toNatural a) (toNatural b)
+
+quotient :: Positive -> Positive -> Natural
+quotient a b = Num.quot (toNatural a) (toNatural b)
+
+remainder :: Positive -> Positive -> Natural
+remainder a b = Num.rem (toNatural a) (toNatural b)
+
+greatestCommonFactor :: Positive -> Positive -> Positive
+greatestCommonFactor a b =
+  case fromNatural (remainder a b) of
+    Nothing -> a
+    Just c -> greatestCommonFactor b c
