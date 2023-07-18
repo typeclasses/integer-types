@@ -124,5 +124,5 @@ remainder a b = Num.rem (toNatural a) (toNatural b)
 greatestCommonFactor :: Positive -> Positive -> Positive
 greatestCommonFactor a b =
   case fromNatural (remainder a b) of
-    Nothing -> a
+    Nothing -> b
     Just c -> greatestCommonFactor b c
