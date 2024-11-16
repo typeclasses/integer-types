@@ -1,3 +1,9 @@
+## 0.1.4.1
+
+Support GHC 9.8
+
+Date: 2024-11-15
+
 ## 0.1.4.0
 
 Added module `Integer.AbsoluteDifference`

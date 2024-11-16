@@ -27,13 +27,16 @@ let
     };
     ghc-9-6 = makeTestConfiguration {
       ghc = pkgs.haskell.packages.ghc96;
+    };
+    ghc-9-8 = makeTestConfiguration {
+      ghc = pkgs.haskell.packages.ghc98;
       overrides = new: old: {
         # x = new.callPackage ./haskell/x.nix { };
       };
     };
     all = pkgs.symlinkJoin {
       name = "integer-types-tests";
-      paths = [ ghc-9-2 ghc-9-4 ghc-9-6 ];
+      paths = [ ghc-9-2 ghc-9-4 ghc-9-6 ghc-9-8 ];
     };
   };
 
